@@ -1,0 +1,27 @@
+@font-face {
+  font-family: "Syphon";
+  src: url("./Syphon-Regular.woff") format("woff"),
+    url("./Syphon-Regular.woff2") format("woff2"),
+    url("./Syphon-Regular.otf") format("opentype"),
+    url("./Syphon-Regular.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Syphon";
+  src: url("./Syphon-Light.woff") format("woff"),
+    url("./Syphon-Light.woff2") format("woff2"),
+    url("./Syphon-Light.otf") format("opentype"),
+    url("./Syphon-Light.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Recia";
+  src: url("./Recia-Bold.woff") format("woff"),
+    url("./Recia-Bold.woff2") format("woff2"),
+    url("./Recia-Bold.otf") format("opentype"),
+    url("./Recia-Bold.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
