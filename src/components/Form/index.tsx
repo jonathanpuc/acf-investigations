@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
 import { NextSeo } from "next-seo";
 import Select from "~/src/components/Select";
-import { Field } from "formik";
+import { Field, FormikValues } from "formik";
 import { FormikStepper, FormikStep } from "~/src/components/FormikStepper";
 import MyInput from "~/src/components/Input";
 import Textarea from "~/src/components/Textarea";
+import RadioInput from "~/src/components/RadioInput";
 
 interface ComponentProps {
   onSubmit: (values) => void;
@@ -15,20 +16,43 @@ interface ComponentProps {
 
 const Form = ({ onSubmit, tasks, initialValues }: ComponentProps) => {
   const mapTaskFields = (field: any) => {
-    const { name, type, options, optional, validation } = field;
+    const { name, type, options, optional, validation, fields } = field;
     const fieldTypes = {
       select: Select,
       text: MyInput,
       textarea: Textarea,
+      conditional: RadioInput,
     };
+
+    if (type !== "conditional")
+      return (
+        <FormikStep validationSchema={validation} key={name}>
+          <Field
+            name={name}
+            component={fieldTypes[type]}
+            options={type === "select" ? options : null}
+            optional={optional}
+          />
+        </FormikStep>
+      );
     return (
-      <FormikStep validationSchema={validation} key={name}>
+      <FormikStep key={name}>
         <Field
           name={name}
-          component={fieldTypes[type]}
-          options={type === "select" ? options : null}
-          optional={optional}
+          component={RadioInput}
+          conditional={type === "conditional"}
+          options={options}
         />
+        {fields.map((childField) => (
+          <Field
+            name={childField.name}
+            dependencyParent={childField.dependencyParent}
+            dependencyCondition={childField.dependencyCondition}
+            dependencyValue={childField.dependencyValue}
+            component={Textarea}
+            key={childField.name}
+          />
+        ))}
       </FormikStep>
     );
   };
@@ -59,14 +83,3 @@ const Form = ({ onSubmit, tasks, initialValues }: ComponentProps) => {
   );
 };
 export default Form;
-
-// validationSchema={object({
-//   impacted_flora: array().of(
-//     object()
-//       .shape({
-//         label: string(),
-//         value: string(),
-//       })
-//       .required()
-//   ),
-// })}

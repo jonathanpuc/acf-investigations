@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Form, Formik, FormikConfig, FormikValues } from "formik";
+import {
+  Form,
+  Formik,
+  FormikConfig,
+  FormikValues,
+  useFormikContext,
+} from "formik";
 
 export interface FormikStepProps
   extends Pick<FormikConfig<FormikValues>, "children" | "validationSchema"> {
@@ -7,6 +13,61 @@ export interface FormikStepProps
 }
 export function FormikStep({ children }: FormikStepProps) {
   return <>{children}</>;
+}
+
+const validateCondition = (
+  values,
+  { dependencyCondition, dependencyParent, dependencyValue }
+) => {
+  if (dependencyCondition === "equals") {
+    return (
+      values[dependencyParent] && values[dependencyParent] === dependencyValue
+    );
+  }
+};
+
+export function WithFormikContext({ children }) {
+  const { values } = useFormikContext();
+
+  const conditional =
+    children.props.children.length &&
+    children.props.children[0] &&
+    children.props.children[0].props.conditional
+      ? true
+      : false;
+
+  if (conditional) {
+    return (
+      <div>
+        {children.props.children[0]}
+        {React.Children.map(children.props.children[1], (child) => {
+          const {
+            dependencyCondition,
+            dependencyParent,
+            dependencyValue,
+          } = child.props;
+
+          if (
+            validateCondition(values, {
+              dependencyCondition,
+              dependencyParent,
+              dependencyValue,
+            })
+          ) {
+            return React.cloneElement(child);
+          }
+          return null;
+        })}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <p>{JSON.stringify(conditional)}</p>
+      {children}
+    </div>
+  );
 }
 
 export function FormikStepper({
@@ -23,18 +84,20 @@ export function FormikStepper({
     FormikStepProps
   >[];
   const [step, setStep] = useState(0);
-  const currentChild = childrenArray[step] as React.ElementType<
-    FormikStepProps
-  >;
+  const currentChild = childrenArray[step] as any;
 
   function isLastStep() {
     return step === childrenArray.length - 1;
   }
 
   const currentTaskInfo = taskInfo[step];
-
   // @ts-ignore
-  const optional = currentChild.props.children.props.optional;
+  const optional = currentChild.props.children.length
+    ? false
+    : // @ts-ignore
+      currentChild.props.children.props.optional;
+
+  console.log(currentChild, "currentChild");
 
   const handleSkip = () => {
     if (isLastStep()) {
@@ -65,11 +128,7 @@ export function FormikStepper({
       >
         {(props) => (
           <Form autoComplete="off">
-            {React.cloneElement(
-              // @ts-ignore
-              currentChild,
-              { values: props.values }
-            )}
+            {<WithFormikContext>{currentChild}</WithFormikContext>}
             <button type="submit">{isLastStep() ? "Submit" : "Next"}</button>
             {optional && (
               <button
@@ -77,7 +136,6 @@ export function FormikStepper({
                 onClick={() => {
                   props.setFieldValue(
                     // @ts-ignore
-
                     currentChild.props.children.props.name,
                     null
                   );

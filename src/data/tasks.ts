@@ -67,7 +67,7 @@ export const ANALYST_TASKS = [
     description:
       "Look through the highlighted document Copy + paste or write the environmental offset conditions so that it’s there’s transparency around the approval holder’s Commitment.",
     validation: object({
-      holder_action: string().required(
+      offset_condition: string().required(
         "We need to know the information surrounding the offset condition"
       ),
     }),
@@ -76,10 +76,53 @@ export const ANALYST_TASKS = [
     name: "rehabilitation_area_exists",
     type: "conditional",
     condition: "Yes",
+    title: "Is there a rehabilitation area?",
+    description:
+      "Look through the highlighted document, copy + paste or write the rehabilitation offset conditions so that it’s there’s transparency around the approval holder’s Commitment.",
+    options: ["yes", "no", "unsure"],
     fields: [
       {
         name: "rehabilitation_offset_conditions",
         type: "textarea",
+        dependencyParent: "rehabilitation_area_exists",
+        dependencyCondition: "equals",
+        dependencyValue: "yes",
+      },
+    ],
+  },
+  {
+    name: "exclusion_area_exists",
+    type: "conditional",
+    condition: "Yes",
+    title: "Is there an exclusion area?",
+    description:
+      "Look through the highlighted document, copy + paste or write the exclusion area conditions so that it’s there’s transparency around the approval holder’s Commitment.",
+    options: ["yes", "no", "unsure"],
+    fields: [
+      {
+        name: "exclusion_area_conditions",
+        type: "textarea",
+        dependencyParent: "exclusion_area_exists",
+        dependencyCondition: "equals",
+        dependencyValue: "yes",
+      },
+    ],
+  },
+  {
+    name: "compliance_reporting_exists",
+    type: "conditional",
+    condition: "Yes",
+    title: "Is there a condition for compliance reporting? ",
+    description:
+      "Look through the highlighted document, copy + paste or write any compliance reporting conditions that the approval holder needs to adhere to.",
+    options: ["yes", "no", "unsure"],
+    fields: [
+      {
+        name: "compliance_reporting_conditions",
+        type: "textarea",
+        dependencyParent: "compliance_reporting_exists",
+        dependencyCondition: "equals",
+        dependencyValue: "yes",
       },
     ],
   },
